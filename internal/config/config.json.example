@@ -1,0 +1,98 @@
+{
+    "server": {
+        "domain": "domain_name",
+        "port": "server_port",
+        "adminOriginUrl": "http://143.198.90.149:9001/", // URL of admin frontend request origin
+        "userOriginUrl": "http://143.198.90.149:9002/" // URL of user frontend request origin
+    },
+    "database": {
+        "host": "database_host",
+        "port": database_port,
+        "user": "database_username",
+        "password": "database_password",
+        "name": "database_name"
+    },
+    "jwt": {
+        "access_secret": "access_secret",
+        "refresh_secret": "refresh_secret",
+        "access_expiry_hour": 5,
+        "refresh_expiry_hour": 7
+    },
+    "redis": {
+        "address": "redis_server_address", // localhost:6379 for development mode
+        "password": "redis_server_password", // "" for development
+        "database": "redis_server_database_name" // 0 for development i.e. 0 is default redis database
+    },
+    "security": {
+        "password_entropy": entrophy_value
+    },
+    "pagination": {
+        "page_size": page_size_limit
+    },
+    "context":{
+        "timeout": 2
+    },
+    "cache": {
+        "expiry_duration": 0  // in seconds
+    },
+     "zoom1":{
+        "client_id":"client_id",
+        "client_secret":"client_secret",
+        "account_id":"account_id",
+        "app_key":"app_key",
+        "app_secret":"app_secret"
+        
+    },
+     "zoom2":{
+        "client_id":"client_id",
+        "client_secret":"client_secret",
+        "account_id":"account_id",
+        "app_key":"app_key",
+        "app_secret":"app_secret"
+        
+    },
+    "notificationService": {
+        "app": "demo",
+        "fcm_id": 1251201,
+        "fcm_ayata_secret": "FCM",
+        "notification_url": "http://192.168.1.68:5001/firebase/notificationTopic",
+        "addFcmUrl": "https://.com.np/firebase"
+      },
+    "verbose": bool,
+    "logger": bool,
+    "huaweiOBS": {
+        "accessKeyID": "access_key_id",
+        "secretAccessKey": "secret_access_key",
+        "bucketName": "bucket_name",
+        "endpoint": "endpoint"
+    },
+    "encryptKey": "rg5xAAImrAKu6OQDCWnHXV8hmtaLaquI", // 32-bit random/secret key for url encryption
+    "paymentGateways": {
+        "esewa": {
+            "url": "https://uat.esewa.com.np/api/epay/transaction/status", // verification base url provided by esewa for verifying transaction
+            "productID": "EPAYTEST", // merchant ID
+            "secretKey": "8gBm/:&EnhH.1/q" // merchant secret key
+        },
+        "khalti": {
+            "url": "https://a.khalti.com/api/v2/epayment/lookup/",  // verification base url provided by khalti for verifying transaction
+            "secretKey": "live_secret_key",
+            "publicKey": "live_public_key"
+        }
+    },
+    "test_attempts": 3,
+    "fileURLSplitString": "myhuaweicloud.com/",
+    "maxRequestLimit": 100,  // maximum number of requests allowed for a user in a minute
+    "referralHoldTime": 2, // time in minutes to hold the use of the referral code by a user
+    "smtp": {
+        "sender":"sender_email",    // email address from which emails will be sent
+        "password":"abcd efgh ijkl mnop",    // app password of sender's account
+        "host":"smtp.gmail.com",    // smtp host server
+        "port":"587"    // port on which smtp is running
+    },
+    "sms": {
+        "sparrow":{
+            "sms_key":"sms_key", // SMS key provided by Sparrow SMS
+            "api":"http://api.sparrowsms.com/v2/sms/" // API for Sparrow SMS
+        }
+    }
+}

@@ -1,0 +1,104 @@
+package gorm
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+
+	"github.com/spf13/viper"
+	"github.com/streadway/amqp"
+)
+
+func (repo *repository) PublishNotification(notificationID uint) error {
+	rabbitMQURL := viper.GetString("rabbitMQ.url")
+	conn, err := amqp.Dial(rabbitMQURL)
+	if err != nil {
+		return fmt.Errorf("failed to connect to RabbitMQ: %v", err)
+	}
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		return fmt.Errorf("failed to open a channel: %v", err)
+	}
+	defer ch.Close()
+
+	err = ch.ExchangeDeclare(
+		"exchange",          // name
+		amqp.ExchangeFanout, // type
+		true,                // durable
+		false,               // auto-deleted
+		false,               // internal
+		false,               // no-wait
+		nil,                 // arguments
+	)
+	if err != nil {
+		return fmt.Errorf("failed to declare an exchange: %v", err)
+	}
+	// Fetch the notification details by ID
+	notification, err := repo.GetNotificationByID(notificationID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch notification details: %v", err)
+	}
+
+	// Marshal the notification body to JSON
+	body, err := json.Marshal(notification)
+	if err != nil {
+		return fmt.Errorf("failed to marshal notification: %v", err)
+	}
+	var routingKey string
+
+	// Determine the routing key based on recipient type
+	switch notification.Recipient {
+	case "verified":
+		routingKey = "verified-users"
+	case "unverified":
+		routingKey = "unverified-users"
+	case "course":
+		// Retrieve users enrolled in the specified course
+		users, err := repo.GetUsersEnrolledInCourse(notification.CourseID)
+		if err != nil {
+			return fmt.Errorf("failed to get users enrolled in course: %v", err)
+		}
+		// Publish the notification to each user enrolled in the course
+		for _, user := range users {
+			notification.Recipient = user.Username
+			body, err := json.Marshal(notification)
+			if err != nil {
+				return fmt.Errorf("failed to marshal notification: %v", err)
+			}
+			err = ch.Publish(
+				"exchange", // exchange
+				routingKey, // routing key
+				false,      // mandatory
+				false,      // immediate
+				amqp.Publishing{
+					ContentType: "application/json",
+					Body:        body,
+				})
+			if err != nil {
+				return fmt.Errorf("failed to publish a message: %v", err)
+			}
+			log.Printf("Notification published for user %s: %s", user.Username, body)
+		}
+		return nil // Return here to avoid publishing the notification again after the loop
+	default:
+		return fmt.Errorf("invalid recipient type: %s", notification.Recipient)
+	}
+
+	err = ch.Publish(
+		"exchange", // exchange
+		routingKey, // routing key
+		false,      // mandatory
+		false,      // immediate
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        body,
+		})
+	if err != nil {
+		return fmt.Errorf("failed to publish a message: %v", err)
+	}
+
+	log.Printf("Notification published: %s", body)
+	return nil
+}

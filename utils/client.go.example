@@ -1,0 +1,173 @@
+// package utils
+
+// import (
+// 	"log"
+
+// 	"github.com/spf13/viper"
+// 	"github.com/streadway/amqp"
+// )
+
+// var RabbitMQConfig = struct {
+// 	URL string
+// }{
+// 	URL: viper.GetString("rabbitMQ.url"),
+// }
+
+// // StartVerifiedUsersConsumer starts a consumer for verified users.
+// func StartVerifiedUsersConsumer() {
+// 	conn, err := amqp.Dial("amqps://civmqhsx:K0p2SeufxVIDPUQ-XTTGvK-6JG48HuXq@puffin.rmq2.cloudamqp.com/civmqhsx")
+// 	if err != nil {
+// 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+// 	}
+// 	defer conn.Close()
+
+// 	queueName := "verified-users-queue" // Adjust queue name as needed
+// 	routingKey := "verified-users"      // Adjust routing key as needed
+
+// 	ch, err := conn.Channel()
+// 	if err != nil {
+// 		log.Fatalf("Failed to open a channel: %v", err)
+// 	}
+// 	defer ch.Close()
+
+// 	err = ch.QueueBind(
+// 		queueName,      // queue name
+// 		routingKey,     // routing key
+// 		"notification", // exchange
+// 		false,
+// 		nil)
+// 	if err != nil {
+// 		log.Panicf("%s", err)
+// 	}
+
+// 	msgs, err := ch.Consume(
+// 		queueName, // queue
+// 		"",        // consumer
+// 		true,      // auto-ack
+// 		false,     // exclusive
+// 		false,     // no-local
+// 		false,     // no-wait
+// 		nil,       // args
+// 	)
+// 	if err != nil {
+// 		log.Fatalf("Failed to register a consumer: %v", err)
+// 	}
+// 	println("----------------------------------------------------------------------------------")
+// 	// Process received messages
+// 	for msg := range msgs {
+// 		log.Printf("Received message for verified user: %s", msg.Body)
+// 	}
+// }
+
+// // StartUnverifiedUsersConsumer starts a consumer for unverified users.
+// func StartUnverifiedUsersConsumer() {
+// 	conn, err := amqp.Dial("amqps://civmqhsx:K0p2SeufxVIDPUQ-XTTGvK-6JG48HuXq@puffin.rmq2.cloudamqp.com/civmqhsx")
+// 	if err != nil {
+// 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+// 	}
+// 	defer conn.Close()
+// 	queueName := "unverified-users-queue"
+
+// 	ch, err := conn.Channel()
+// 	if err != nil {
+// 		log.Fatalf("Failed to open a channel: %v", err)
+// 	}
+// 	defer ch.Close()
+// 	err = ch.QueueBind(
+// 		queueName,          // queue name
+// 		"unverified-users", // routing key
+// 		"notification",     // exchange
+// 		false,
+// 		nil)
+// 	if err != nil {
+// 		log.Panicf("%s", err)
+// 	}
+// 	msgs, err := ch.Consume(
+// 		queueName, // queue
+// 		"",        // consumer
+// 		true,      // auto-ack
+// 		false,     // exclusive
+// 		false,     // no-local
+// 		false,     // no-wait
+// 		nil,       // args
+// 	)
+// 	if err != nil {
+// 		log.Fatalf("Failed to register a consumer: %v", err)
+// 	}
+// 	println("****************************************************************************************")
+// 	// Process received messages
+// 	for msg := range msgs {
+// 		log.Printf("Received message for unverified user: %s", msg.Body)
+// 	}
+// }
+
+// // StartCourseNotificationsConsumer starts a consumer for course notifications.
+// // func StartCourseNotificationsConsumer(courseID string) error {
+// // 	conn, err := amqp.Dial(RabbitMQConfig.URL)
+// // 	if err != nil {
+// // 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
+// // 	}
+// // 	defer conn.Close()
+
+// // 	ch, err := conn.Channel()
+// // 	if err != nil {
+// // 		log.Fatalf("Failed to open a channel: %v", err)
+// // 	}
+// // 	defer ch.Close()
+
+// // 	q, err := ch.QueueDeclare(
+// // 		fmt.Sprintf("course-%s-notifications", courseID),
+// // 		false,
+// // 		false,
+// // 		false,
+// // 		false,
+// // 		nil,
+// // 	)
+// // 	if err != nil {
+// // 		log.Fatalf("Failed to declare a queue: %v", err)
+// // 	}
+
+// // 	msgs, err := ch.Consume(
+// // 		q.Name,
+// // 		"",
+// // 		true,
+// // 		false,
+// // 		false,
+// // 		false,
+// // 		nil,
+// // 	)
+// // 	if err != nil {
+// // 		log.Fatalf("Failed to register a consumer: %v", err)
+// // 	}
+
+// // 	for msg := range msgs {
+// // 		var notification models.Notification
+// // 		err := json.Unmarshal(msg.Body, &notification)
+// // 		if err != nil {
+// // 			log.Printf("Failed to unmarshal message: %v", err)
+// // 			continue
+// // 		}
+
+// // 		log.Printf("Received notification for course %s: %+v", courseID, notification)
+// // 	}
+// // 	return err
+// // }
+
+// // func main() {
+// // 	go consumeVerifiedUsers()
+// // 	go consumeUnverifiedUsers()
+
+// // 	// Fetch notifications from the database
+// // 	notifications, err := fetchNotifications()
+// // 	if err != nil {
+// // 		log.Fatalf("Error fetching notifications: %v", err)
+// // 	}
+
+// // 	// Start course consumers based on the course IDs fetched from notifications
+// // 	for _, notification := range notifications {
+// // 		go StartCourseNotificationsConsumer(notification.CourseID)
+// // 	}
+
+// // 	// Keep the main goroutine running
+// // 	select {}
+// // }

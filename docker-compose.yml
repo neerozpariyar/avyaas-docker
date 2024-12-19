@@ -1,0 +1,56 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: avyaas
+    networks:
+      - avyaas
+    volumes:
+      - avyaas:/usr/src/app/data
+    ports:
+      - "9000:9000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+  redis:
+    image: redis:6.2
+    container_name: redis_avyaas
+    networks:
+      - avyaas
+    ports:
+      - "6380:6379"
+    command: ["redis-server"] 
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    networks:
+      - avyaas
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: avyaas
+      MYSQL_USER: kafka
+      MYSQL_PASSWORD: kafka
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  avyaas:
+  db_data:
+networks:
+  avyaas:

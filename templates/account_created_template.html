@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Created</title>
+    <style>
+        /* Inline CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #666666;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+
+<script>
+        // JavaScript for email verification
+        function verifyAccount() {
+            // Assuming a simple alert for demonstration purposes
+            alert("Your account has been verified successfully!");
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <img src="https://lh3.googleusercontent.com/V5Ec4DO6JHUYOeiuZGSSdQG8gkpjK515eOGigciiJk2fqI5xDKJd7ehJrrXBUlcdjann9QzlaUcXOlpgWzAfaaLJe6BUSuxOAv-d=h200" alt="">
+        <h1>Welcome to NameOnline!</h1>
+        <p>Your teacher account has been successfully created.</p>
+        <p>Below are your login credentials:</p>
+        <p><strong>Email:</strong> <span id="username">{{.Email}}</span></p>
+        <p><strong>Password:</strong> <span id="password">{{.Password}}</span></p>
+        <p>Please click the button below to verify your account:</p>
+        <a href="http://143.198.90.149:9002/login/"><button class="btn">Verify Account</button></a>
+    </div>
+</body>
+
+</html>

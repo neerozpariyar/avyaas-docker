@@ -1,0 +1,52 @@
+name: Build and Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+
+      - name: Export all
+        run: |
+          export GOPRIVATE=github.com/Ayata-Incorporation/roles_and_permission
+          echo "machine github.com
+          login ${{ secrets.USERNAME }}
+          password ${{ secrets.TOKEN }}
+          " > ~/.netrc
+          go get github.com/Ayata-Incorporation/roles_and_permission
+          go mod tidy
+
+      - name: Build Go binary
+        run: go build -o avyaas-test cmd/avyaas/main.go
+
+      - name: Set up SSH agent
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan $DO_SERVER_IP >> ~/.ssh/known_hosts          
+        env:
+          DO_SERVER_IP: ${{ secrets.DO_SERVER_IP }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy Avyaas v3.0 to DigitalOcean
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@$DO_SERVER_IP "systemctl stop avyaas-test"
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no avyaas-test root@$DO_SERVER_IP:/root/app/avyaas/backend
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@$DO_SERVER_IP "chmod +x /root/app/avyaas/backend/avyaas-test"
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no root@$DO_SERVER_IP "systemctl restart avyaas-test"
+        env:
+          DO_SERVER_IP: ${{ secrets.DO_SERVER_IP }}
+
